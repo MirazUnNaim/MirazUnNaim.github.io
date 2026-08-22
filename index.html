@@ -979,15 +979,15 @@ const SITE_DATA = {
   },
   "notes": [
     {
-      "title": "Building a cache controller FSM from scratch",
+      "title": "Modeling a cache controller as a state machine",
       "date": "2026",
-      "summary": "Notes on designing a direct-mapped write-back cache controller for my Computer Architecture coursework — modeling IDLE, COMPARE_TAG, WRITE_BACK, and ALLOCATE as explicit states, and what got confusing about dirty-bit handling on eviction.",
+      "summary": "For my Computer Architecture assignment I had to simulate a direct-mapped write-back cache controller cycle by cycle. Thinking of it as an explicit FSM (IDLE → COMPARE_TAG → WRITE_BACK → ALLOCATE) made the logic click for me — the part that actually tripped me up was getting dirty-bit handling right on eviction, since it's easy to write back a clean line by mistake if the state transitions aren't airtight.",
       "url": "https://github.com/MirazUnNaim/CoA-Assignment-"
     },
     {
-      "title": "What I learned shipping a booking API under hackathon time pressure",
+      "title": "Lessons from building a booking API under a hackathon clock",
       "date": "2026",
-      "summary": "Reflections from ICT Fest Hackathon on building a multi-tenant coworking booking API — JWT rotation, rate limiting, and why conflict-safe concurrent bookings were the hardest part to get right with limited time.",
+      "summary": "At the ICT Fest Hackathon I built a multi-tenant coworking booking API in a tight window. JWT auth and rate limiting were straightforward, but conflict-safe concurrent bookings ate most of my time — two users trying to book the same slot at once is a much easier bug to introduce than to catch. That project taught me to think about concurrency early instead of bolting it on at the end.",
       "url": "https://github.com/MirazUnNaim/ICT_Fest_Hackathon_Preliminary"
     }
   ],
