@@ -1,0 +1,1243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Miraz Un Naim — CSE @ IUT</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;1,9..144,300&display=swap" rel="stylesheet" />
+  <style>
+    /* ─── TOKENS ─────────────────────────────── */
+    :root {
+      --ink:      #0f0c0a;
+      --ink2:     #171310;
+      --ink3:     #201a16;
+      --line:     #2b241d;
+      --dim:      #473c30;
+      --mid:      #7a6f60;
+      --pale:     #b0a898;
+      --snow:     #ede6da;
+      --white:    #faf5ec;
+      --v:        #e08a4c;       /* amber/terracotta — single chromatic anchor */
+      --v-glow:   rgba(224,138,76,.08);
+      --v-dim:    rgba(224,138,76,.18);
+      --serif:    'Fraunces', Georgia, serif;
+      --sans:     'Inter', system-ui, sans-serif;
+      --mono:     'JetBrains Mono', monospace;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+
+    body {
+      background: var(--ink);
+      color: var(--pale);
+      font-family: var(--sans);
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* grain */
+    body::after {
+      content: '';
+      position: fixed; inset: 0; pointer-events: none; z-index: 9999;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+      opacity: .5;
+    }
+
+    ::-webkit-scrollbar { width: 3px; }
+    ::-webkit-scrollbar-track { background: var(--ink); }
+    ::-webkit-scrollbar-thumb { background: var(--dim); }
+
+    a { color: inherit; text-decoration: none; }
+
+    /* ─── LAYOUT SHELL ───────────────────────── */
+    .page { max-width: 1100px; margin: 0 auto; padding: 0 5vw; }
+
+    /* ─── NAV ────────────────────────────────── */
+    header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+      transition: background .35s, backdrop-filter .35s;
+    }
+    header.stuck {
+      background: rgba(15,12,10,.88);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--line);
+    }
+    .nav-inner {
+      max-width: 1100px; margin: 0 auto; padding: 0 5vw;
+      height: 60px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-wordmark {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--v);
+      letter-spacing: .05em;
+    }
+    .nav-wordmark span { color: var(--dim); }
+    nav ul { list-style: none; display: flex; gap: 32px; }
+    nav a {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: .1em;
+      color: var(--mid);
+      transition: color .2s;
+    }
+    nav a:hover { color: var(--white); }
+    nav a.active { color: var(--v); }
+
+    .scroll-progress {
+      position: fixed; top: 0; left: 0; height: 2px;
+      background: var(--v);
+      width: 0%;
+      z-index: 300;
+      transition: width .1s linear;
+    }
+
+    /* ─── HERO ───────────────────────────────── */
+    #home {
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: 1fr auto;
+      padding-top: 60px;
+    }
+    .hero-body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 80px 5vw 0;
+      max-width: 1100px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .hero-kicker {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--mid);
+      margin-bottom: 28px;
+      display: flex; align-items: center; gap: 14px;
+    }
+    .hero-kicker::after {
+      content: '';
+      flex: 1; max-width: 60px;
+      height: 1px; background: var(--dim);
+    }
+
+    .hero-name {
+      font-family: var(--serif);
+      font-size: clamp(52px, 8.5vw, 110px);
+      font-weight: 300;
+      color: var(--white);
+      line-height: .95;
+      letter-spacing: -.03em;
+      margin-bottom: 10px;
+    }
+    .hero-name em {
+      font-style: italic;
+      color: var(--v);
+    }
+
+    .hero-role {
+      font-family: var(--mono);
+      font-size: clamp(11px, 1.2vw, 13px);
+      color: var(--mid);
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      margin-bottom: 40px;
+      margin-left: 4px;
+    }
+
+    .hero-bio {
+      font-size: 16px;
+      color: var(--pale);
+      max-width: 480px;
+      line-height: 1.8;
+      margin-bottom: 48px;
+    }
+
+    .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+
+    .pill {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 10px 20px;
+      border-radius: 100px;
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: .08em;
+      transition: all .2s;
+      cursor: pointer;
+    }
+    .pill-solid {
+      background: var(--v);
+      color: #fff;
+      border: 1px solid var(--v);
+    }
+    .pill-solid:hover { background: #ec9d63; transform: translateY(-1px); }
+    .pill-outline {
+      background: transparent;
+      color: var(--pale);
+      border: 1px solid var(--dim);
+    }
+    .pill-outline:hover { border-color: var(--v); color: var(--v); transform: translateY(-1px); }
+
+    .hero-footer {
+      padding: 32px 5vw;
+      max-width: 1100px; margin: 0 auto;
+      display: flex; align-items: center; gap: 16px;
+    }
+    .hero-footer-line { flex: 1; height: 1px; background: var(--line); }
+    .hero-footer-text {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: .12em;
+      color: var(--dim);
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .blink { animation: blink 1.1s step-start infinite; }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    /* ─── SECTION SKELETON ───────────────────── */
+    .section {
+      padding: 100px 0;
+      border-top: 1px solid var(--line);
+      scroll-margin-top: 60px;
+    }
+    .section-head {
+      display: flex; align-items: baseline; gap: 18px;
+      margin-bottom: 56px;
+    }
+    .section-title {
+      font-family: var(--serif);
+      font-size: clamp(28px, 3.5vw, 44px);
+      font-weight: 300;
+      color: var(--white);
+      letter-spacing: -.02em;
+    }
+    .section-title em { font-style: italic; color: var(--v); }
+    .section-num {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--dim);
+      letter-spacing: .1em;
+      padding-bottom: 2px;
+    }
+
+    /* ─── ABOUT ──────────────────────────────── */
+    .about-split {
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      gap: 64px;
+      align-items: start;
+    }
+    .about-text p {
+      font-size: 15px;
+      color: var(--pale);
+      margin-bottom: 18px;
+      line-height: 1.85;
+    }
+    .about-text p:last-child { margin-bottom: 0; }
+    .about-text strong { color: var(--snow); font-weight: 500; }
+
+    .chip-group { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 28px; }
+    .chip {
+      font-family: var(--mono);
+      font-size: 10.5px;
+      padding: 4px 11px;
+      border-radius: 3px;
+      border: 1px solid var(--line);
+      color: var(--mid);
+      background: var(--ink2);
+      letter-spacing: .04em;
+      transition: border-color .2s, color .2s;
+      cursor: default;
+    }
+    .chip:hover { border-color: var(--v-dim); color: var(--v); }
+    .chip-head {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--dim);
+      margin-bottom: 12px;
+    }
+
+    /* ─── PROJECTS ───────────────────────────── */
+    .proj-sublabel {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--dim);
+      margin-bottom: 18px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--line);
+    }
+    .proj-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+      gap: 14px;
+      margin-bottom: 52px;
+    }
+    .proj-card {
+      background: var(--ink2);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 26px 26px 22px;
+      display: flex; flex-direction: column;
+      gap: 0;
+      transition: border-color .25s, box-shadow .25s, transform .25s;
+      position: relative;
+      overflow: hidden;
+    }
+    .proj-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--v);
+      transform: scaleX(0); transform-origin: left;
+      transition: transform .3s;
+    }
+    .proj-card:hover::before { transform: scaleX(1); }
+    .proj-card:hover {
+      border-color: var(--v-dim);
+      box-shadow: 0 8px 40px rgba(0,0,0,.4), 0 0 32px var(--v-glow);
+      transform: translateY(-2px);
+    }
+    .proj-card.contrib::before { background: var(--mid); }
+    .proj-card.contrib:hover { border-color: var(--dim); }
+
+    .proj-top {
+      display: flex; justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 14px;
+    }
+    .proj-emoji { font-size: 22px; line-height: 1; }
+    .proj-arrow {
+      font-family: var(--mono);
+      font-size: 14px;
+      color: var(--dim);
+      transition: color .2s, transform .2s;
+    }
+    .proj-card:hover .proj-arrow { color: var(--v); transform: translate(2px,-2px); }
+    .proj-card.contrib:hover .proj-arrow { color: var(--mid); }
+
+    .proj-name {
+      font-family: var(--serif);
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--snow);
+      margin-bottom: 10px;
+      letter-spacing: -.01em;
+    }
+    .proj-desc {
+      font-size: 13px;
+      color: var(--mid);
+      line-height: 1.7;
+      flex: 1;
+      margin-bottom: 20px;
+    }
+    .proj-foot {
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    }
+    .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .dot-py  { background: #3572A5; }
+    .dot-cpp { background: #f34b7d; }
+    .dot-java{ background: #b07219; }
+    .lang-name {
+      font-family: var(--mono);
+      font-size: 10.5px;
+      color: var(--mid);
+    }
+    .badge {
+      font-family: var(--mono);
+      font-size: 9.5px;
+      letter-spacing: .06em;
+      padding: 2px 8px;
+      border-radius: 2px;
+    }
+    .b-v  { background: var(--v-glow); color: var(--v); border: 1px solid var(--v-dim); }
+    .b-g  { background: rgba(74,222,128,.07); color: #4ade80; border: 1px solid rgba(74,222,128,.18); }
+    .b-y  { background: rgba(251,191,36,.07); color: #fbbf24; border: 1px solid rgba(251,191,36,.18); }
+
+    .proj-ghost {
+      border-style: dashed;
+      opacity: .32;
+      pointer-events: none;
+    }
+
+    /* ─── SKILLS TABLE ───────────────────────── */
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+    }
+    .skill-cell {
+      background: var(--ink2);
+      padding: 22px 24px;
+      transition: background .2s;
+    }
+    .skill-cell:hover { background: var(--ink3); }
+    .skill-cell:first-child { border-radius: 8px 0 0 0; }
+    .skill-cell:nth-child(3) { border-radius: 0 8px 0 0; }
+    .skill-cell:nth-last-child(3) { border-radius: 0 0 0 8px; }
+    .skill-cell:last-child { border-radius: 0 0 8px 0; }
+    .skill-head {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--v);
+      margin-bottom: 14px;
+    }
+    .skill-items {
+      display: flex; flex-wrap: wrap; gap: 6px;
+    }
+    .skill-tag {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--mid);
+      padding: 3px 9px;
+      border: 1px solid var(--line);
+      border-radius: 2px;
+      background: var(--ink);
+      transition: color .2s, border-color .2s;
+    }
+    .skill-tag:hover { color: var(--snow); border-color: var(--dim); }
+
+    /* ─── ACADEMIC ───────────────────────────── */
+    .academic-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 40px;
+    }
+    .acad-card {
+      background: var(--ink2);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 28px;
+      position: relative;
+      overflow: hidden;
+    }
+    .acad-card::after {
+      content: '';
+      position: absolute; bottom: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, var(--v) 0%, transparent 100%);
+    }
+    .acad-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: .14em;
+      color: var(--v);
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .acad-title {
+      font-family: var(--serif);
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--snow);
+      margin-bottom: 4px;
+    }
+    .acad-sub {
+      font-size: 13px;
+      color: var(--mid);
+    }
+
+    .course-cols {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .course-item {
+      display: flex; align-items: center; gap: 10px;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--mid);
+      padding: 10px 12px;
+      background: var(--ink2);
+      border-radius: 4px;
+      border: 1px solid var(--line);
+      transition: border-color .2s, color .2s;
+    }
+    .course-item:hover { border-color: var(--v-dim); color: var(--pale); }
+    .course-item::before { content: '›'; color: var(--v); font-size: 13px; }
+    .course-item.upcoming { opacity: .4; }
+
+    /* ─── NOTES ──────────────────────────────── */
+    .notes-list { display: flex; flex-direction: column; gap: 14px; }
+    .note-card {
+      display: block;
+      background: var(--ink2);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 22px 26px;
+      transition: border-color .25s, transform .25s;
+    }
+    .note-card:hover { border-color: var(--v-dim); transform: translateX(2px); }
+    .note-top {
+      display: flex; align-items: baseline; justify-content: space-between;
+      gap: 12px; margin-bottom: 8px;
+    }
+    .note-title {
+      font-family: var(--serif);
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--snow);
+    }
+    .note-date {
+      font-family: var(--mono);
+      font-size: 10.5px;
+      color: var(--dim);
+      white-space: nowrap;
+    }
+    .note-summary { font-size: 13px; color: var(--mid); line-height: 1.7; }
+
+    /* ─── CONTACT ────────────────────────────── */
+    .contact-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 64px;
+      align-items: start;
+    }
+    .contact-blurb {
+      font-size: 15px;
+      color: var(--pale);
+      line-height: 1.85;
+      margin-bottom: 32px;
+    }
+    .contact-blurb strong { color: var(--snow); font-weight: 500; }
+
+    .contact-links { display: flex; flex-direction: column; gap: 10px; }
+    .clink {
+      display: flex; align-items: center; gap: 14px;
+      padding: 15px 18px;
+      background: var(--ink2);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      transition: border-color .2s, background .2s;
+    }
+    .clink:hover { border-color: var(--v-dim); background: var(--v-glow); }
+    .clink-icon { color: var(--v); width: 20px; text-align: center; flex-shrink: 0; }
+    .clink-label { font-family: var(--mono); font-size: 12px; color: var(--snow); }
+    .clink-val { font-family: var(--mono); font-size: 10.5px; color: var(--mid); margin-left: auto; }
+
+    .contact-note {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--dim);
+      line-height: 1.8;
+    }
+    .contact-note span { color: var(--mid); }
+
+    /* ─── FOOTER ─────────────────────────────── */
+    .site-footer {
+      border-top: 1px solid var(--line);
+      padding: 28px 5vw;
+      max-width: 1100px; margin: 0 auto;
+      display: flex; justify-content: space-between; align-items: center;
+      gap: 16px;
+    }
+    .footer-copy {
+      font-family: var(--mono);
+      font-size: 10.5px;
+      color: var(--dim);
+    }
+    .footer-copy em { color: var(--mid); font-style: normal; }
+    .footer-links { display: flex; gap: 20px; }
+    .footer-links a {
+      font-family: var(--mono);
+      font-size: 10.5px;
+      color: var(--dim);
+      transition: color .2s;
+    }
+    .footer-links a:hover { color: var(--v); }
+
+    /* ─── ANIMATIONS ─────────────────────────── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity .55s ease, transform .55s ease;
+    }
+    .reveal.in { opacity: 1; transform: none; }
+
+    /* ─── RESPONSIVE ─────────────────────────── */
+    @media (max-width: 720px) {
+      .about-split, .academic-row, .contact-layout { grid-template-columns: 1fr; gap: 32px; }
+      .skills-grid { grid-template-columns: 1fr; }
+      .course-cols { grid-template-columns: 1fr; }
+      nav ul { display: none; }
+      .site-footer { flex-direction: column; text-align: center; }
+      .skill-cell:first-child { border-radius: 8px 8px 0 0; }
+      .skill-cell:nth-child(3) { border-radius: 0; }
+      .skill-cell:nth-last-child(3) { border-radius: 0; }
+      .skill-cell:last-child { border-radius: 0 0 8px 8px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── HEADER ── -->
+<div class="scroll-progress" id="scrollProgress"></div>
+<header id="hdr">
+  <div class="nav-inner">
+    <div class="nav-wordmark" id="navWordmark"></div>
+    <nav>
+      <ul id="navLinks"></ul>
+    </nav>
+  </div>
+</header>
+
+<!-- ── HERO ── -->
+<div id="home">
+  <div class="hero-body">
+    <div class="hero-kicker" id="heroKicker"></div>
+    <h1 class="hero-name" id="heroName"></h1>
+    <p class="hero-role" id="heroRole"></p>
+    <p class="hero-bio" id="heroBio"></p>
+    <div class="hero-actions" id="heroActions"></div>
+  </div>
+  <div class="hero-footer">
+    <div class="hero-footer-line"></div>
+    <div class="hero-footer-text" id="heroFooterText"></div>
+    <div class="hero-footer-line"></div>
+  </div>
+</div>
+
+<!-- ── ABOUT ── -->
+<div class="page">
+  <section class="section" id="about">
+    <div class="section-head">
+      <span class="section-num">00 ──</span>
+      <h2 class="section-title">A bit about <em id="aboutNameEm"></em></h2>
+    </div>
+    <div class="about-split reveal">
+      <div class="about-text" id="aboutText"></div>
+      <div>
+        <p class="chip-head">Currently working with</p>
+        <div class="chip-group" id="chipsCurrent" style="margin-bottom:28px;"></div>
+        <p class="chip-head">Curious about</p>
+        <div class="chip-group" id="chipsCurious"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── PROJECTS ── -->
+  <section class="section" id="projects">
+    <div class="section-head">
+      <span class="section-num">01 ──</span>
+      <h2 class="section-title">Things I've <em>shipped</em></h2>
+    </div>
+
+    <p class="proj-sublabel">My repositories</p>
+    <div class="proj-grid" id="projGridOwn"></div>
+
+    <p class="proj-sublabel">Team contributions</p>
+    <div class="proj-grid" id="projGridContrib"></div>
+  </section>
+
+  <!-- ── SKILLS ── -->
+  <section class="section" id="skills">
+    <div class="section-head">
+      <span class="section-num">02 ──</span>
+      <h2 class="section-title">What I work <em>with</em></h2>
+    </div>
+    <div class="skills-grid reveal" id="skillsGrid"></div>
+  </section>
+
+  <!-- ── ACADEMIC ── -->
+  <section class="section" id="academic">
+    <div class="section-head">
+      <span class="section-num">03 ──</span>
+      <h2 class="section-title"><em>Academic</em> journey</h2>
+    </div>
+    <div class="academic-row reveal" id="academicRow"></div>
+    <div class="reveal">
+      <p class="chip-head" style="margin-bottom:14px;">Coursework</p>
+      <div class="course-cols" id="courseCols"></div>
+    </div>
+  </section>
+
+  <!-- ── NOTES ── -->
+  <section class="section" id="notes">
+    <div class="section-head">
+      <span class="section-num">04 ──</span>
+      <h2 class="section-title">Notes &amp; <em>writing</em></h2>
+    </div>
+    <div class="notes-list reveal" id="notesList"></div>
+  </section>
+
+  <!-- ── CONTACT ── -->
+  <section class="section" id="contact">
+    <div class="section-head">
+      <span class="section-num">05 ──</span>
+      <h2 class="section-title">Let's <em>talk</em></h2>
+    </div>
+    <div class="contact-layout reveal">
+      <div>
+        <p class="contact-blurb" id="contactBlurb"></p>
+        <p class="contact-note" id="contactNote"></p>
+      </div>
+      <div class="contact-links" id="contactLinks"></div>
+    </div>
+  </section>
+</div>
+
+<footer>
+  <div class="site-footer">
+    <p class="footer-copy" id="footerCopy"></p>
+    <div class="footer-links" id="footerLinks"></div>
+  </div>
+</footer>
+
+<script>
+/* ════════════════════════════════════════════════════════════════
+   SITE_DATA — single source of truth, embedded directly so this
+   file works anywhere: double-click it, open via file://, drop it
+   in any preview tool, or host it on GitHub Pages — no server,
+   no separate data file, no fetch() needed.
+
+   To update content, just edit the object below and save.
+   ════════════════════════════════════════════════════════════════ */
+const SITE_DATA = {
+  "name": {
+    "first": "Miraz",
+    "last": "Un Naim"
+  },
+  "tagline": "CSE · 4th Semester · IUT Dhaka",
+  "role": "Backend Engineer  /  Systems Thinker  /  Hackathon Builder",
+  "bio": "I build REST APIs, simulate cache controllers, and ship gym planners at 2 AM. Currently studying CSE at Islamic University of Technology while getting reps in on real projects.",
+  "footerBlink": "patience and patience",
+  "socials": {
+    "github": {
+      "user": "MirazUnNaim",
+      "url": "https://github.com/MirazUnNaim"
+    },
+    "linkedin": {
+      "handle": "linkedin.com/in/miraz-naim",
+      "url": "https://www.linkedin.com/in/miraz-naim"
+    },
+    "email": "mirazunnaim@iut-dhaka.edu"
+  },
+  "nav": [
+    {
+      "label": "about",
+      "href": "#about"
+    },
+    {
+      "label": "projects",
+      "href": "#projects"
+    },
+    {
+      "label": "skills",
+      "href": "#skills"
+    },
+    {
+      "label": "academic",
+      "href": "#academic"
+    },
+    {
+      "label": "notes",
+      "href": "#notes"
+    },
+    {
+      "label": "contact",
+      "href": "#contact"
+    }
+  ],
+  "about": {
+    "paragraphs": [
+      "I'm a 4th-semester <strong>CSE student at IUT</strong> (Islamic University of Technology, Gazipur). I write C++ that talks to hardware, Python that serves HTTP, and occasionally commit at unreasonable hours.",
+      "My work spans low-level systems (cache FSMs, architecture assignments) and higher-level backend engineering (FastAPI services with JWT auth, Docker, concurrent booking logic). I've shipped real code in <strong>competitive hackathons</strong> and team projects across both tracks.",
+      "I'm in my fourth semester — which means there's a lot more coming. This page is designed to grow with me."
+    ],
+    "currentlyWorkingWith": [
+      "Python",
+      "FastAPI",
+      "SQLAlchemy",
+      "Docker",
+      "JWT Auth",
+      "C++",
+      "Java",
+      "Git",
+      "Linux",
+      "SQLite"
+    ],
+    "curiousAbout": [
+      "Computer Architecture",
+      "Operating Systems",
+      "Algorithms",
+      "Backend Systems",
+      "AI Engineering"
+    ]
+  },
+  "projects": {
+    "own": [
+      {
+        "emoji": "🏢",
+        "name": "CoWork — Booking API",
+        "url": "https://github.com/MirazUnNaim/ICT_Fest_Hackathon_Preliminary",
+        "desc": "Multi-tenant coworking space booking REST API. JWT auth with token rotation, rate limiting (20 req/60s), conflict-safe concurrent bookings, tiered refund policy, admin usage reports, CSV export. Containerised with Docker.",
+        "lang": "Python",
+        "dot": "dot-py",
+        "badges": [
+          {
+            "text": "ICT Fest Hackathon",
+            "cls": "b-g"
+          },
+          {
+            "text": "FastAPI",
+            "cls": "b-v"
+          }
+        ]
+      },
+      {
+        "emoji": "✅",
+        "name": "Todo API — Mock Hackathon",
+        "url": "https://github.com/MirazUnNaim/Agentic_AI_Hackathon_Mock",
+        "desc": "JWT-authenticated task management API. Per-user todos with title, description, deadline, and priority (low / medium / high). Built under time pressure for a mock agentic AI hackathon. Dockerised.",
+        "lang": "Python",
+        "dot": "dot-py",
+        "badges": [
+          {
+            "text": "Mock Hackathon",
+            "cls": "b-g"
+          },
+          {
+            "text": "FastAPI",
+            "cls": "b-v"
+          }
+        ]
+      },
+      {
+        "emoji": "⚙️",
+        "name": "Cache Controller FSM",
+        "url": "https://github.com/MirazUnNaim/CoA-Assignment-",
+        "desc": "Finite state machine–based direct-mapped write-back cache controller in C++. Simulates IDLE → COMPARE_TAG → WRITE_BACK → ALLOCATE transitions cycle-by-cycle, handling hits, misses, and dirty evictions. CoA coursework.",
+        "lang": "C++",
+        "dot": "dot-cpp",
+        "badges": [
+          {
+            "text": "Computer Architecture",
+            "cls": "b-v"
+          }
+        ]
+      }
+    ],
+    "contrib": [
+      {
+        "emoji": "🏋️",
+        "name": "Alphen — Gym Planner",
+        "url": "https://github.com/KajPariNa/Alphen",
+        "desc": "Console-based gym management system in C++ (5-person team, 47 commits). 30+ exercise types, free/premium user tiers, diet planner, health tracker, file persistence. I built the workout system and exercise content layer.",
+        "lang": "C++",
+        "dot": "dot-cpp",
+        "badges": [
+          {
+            "text": "Team · 5 people",
+            "cls": "b-y"
+          },
+          {
+            "text": "OOP",
+            "cls": "b-y"
+          }
+        ]
+      },
+      {
+        "emoji": "☕",
+        "name": "Rabitah Project",
+        "url": "https://github.com/rabitah011/Rabitah-Project",
+        "desc": "Collaborative Java project — team contribution.",
+        "lang": "Java",
+        "dot": "dot-java",
+        "badges": [
+          {
+            "text": "Team project",
+            "cls": "b-y"
+          }
+        ]
+      }
+    ],
+    "ghost": {
+      "label": "Semester 5 incoming",
+      "desc": "This slot is waiting."
+    }
+  },
+  "skills": [
+    {
+      "head": "Languages",
+      "items": [
+        "Python",
+        "C++",
+        "C",
+        "Java"
+      ]
+    },
+    {
+      "head": "Backend &amp; APIs",
+      "items": [
+        "FastAPI",
+        "SQLAlchemy",
+        "SQLite",
+        "JWT Auth",
+        "REST",
+        "Docker"
+      ]
+    },
+    {
+      "head": "Systems &amp; CS",
+      "items": [
+        "FSM Design",
+        "Cache Architecture",
+        "OOP",
+        "Algorithms"
+      ]
+    },
+    {
+      "head": "Tools",
+      "items": [
+        "Git",
+        "GitHub",
+        "Linux",
+        "VS Code",
+        "Postman"
+      ]
+    },
+    {
+      "head": "Concepts",
+      "items": [
+        "Concurrency",
+        "Rate Limiting",
+        "Multi-tenancy",
+        "File I/O",
+        "Data Structures"
+      ]
+    },
+    {
+      "head": "Working on",
+      "items": [
+        "Operating Systems",
+        "Database Systems",
+        "Computer Networks"
+      ]
+    }
+  ],
+  "academic": {
+    "cards": [
+      {
+        "label": "Currently enrolled",
+        "title": "Islamic University of Technology",
+        "sub": "B.Sc. in Computer Science &amp; Engineering · 4th Semester<br/>OIC member university · Gazipur, Bangladesh"
+      },
+      {
+        "label": "Student ID",
+        "title": "230041241",
+        "sub": "Hackathons, team projects, and coursework across architecture, backend engineering, and systems programming."
+      }
+    ],
+    "courses": [
+      {
+        "name": "Computer Organization &amp; Architecture",
+        "upcoming": false
+      },
+      {
+        "name": "Object-Oriented Programming",
+        "upcoming": false
+      },
+      {
+        "name": "Data Structures &amp; Algorithms",
+        "upcoming": false
+      },
+      {
+        "name": "Probability &amp; Statistics",
+        "upcoming": false
+      },
+      {
+        "name": "Discrete Mathematics",
+        "upcoming": false
+      },
+      {
+        "name": "Digital Logic Design",
+        "upcoming": false
+      },
+      {
+        "name": "Operating Systems",
+        "upcoming": true
+      },
+      {
+        "name": "Database Systems",
+        "upcoming": true
+      }
+    ]
+  },
+  "notes": [
+    {
+      "title": "Building a cache controller FSM from scratch",
+      "date": "2026",
+      "summary": "Notes on designing a direct-mapped write-back cache controller for my Computer Architecture coursework — modeling IDLE, COMPARE_TAG, WRITE_BACK, and ALLOCATE as explicit states, and what got confusing about dirty-bit handling on eviction.",
+      "url": "https://github.com/MirazUnNaim/CoA-Assignment-"
+    },
+    {
+      "title": "What I learned shipping a booking API under hackathon time pressure",
+      "date": "2026",
+      "summary": "Reflections from ICT Fest Hackathon on building a multi-tenant coworking booking API — JWT rotation, rate limiting, and why conflict-safe concurrent bookings were the hardest part to get right with limited time.",
+      "url": "https://github.com/MirazUnNaim/ICT_Fest_Hackathon_Preliminary"
+    }
+  ],
+  "contact": {
+    "blurb": "Open to collaboration, interesting project ideas, or just a good conversation about <strong>systems, code, or anything CS</strong>. I'm in my fourth semester — still lots to learn, always happy to build.",
+    "note": "Best way to reach me is email.<br/><span>I usually reply within a day.</span>"
+  },
+  "footer": {
+    "copyrightYear": 2026,
+    "builtWith": "Built with HTML, CSS &amp; JS"
+  }
+};
+
+/* ─── ICONS ─────────────────────────────── */
+const ICONS = {
+  github: `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>`,
+  linkedin: `<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>`
+};
+
+/* ─── HELPERS ─────────────────────────────── */
+const $ = (id) => document.getElementById(id);
+const el = (tag, attrs = {}, html = "") => {
+  const node = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (k === "class") node.className = v;
+    else node.setAttribute(k, v);
+  }
+  if (html !== undefined) node.innerHTML = html;
+  return node;
+};
+
+/* ─── RENDERERS ─────────────────────────────── */
+function renderNav() {
+  const wordmark = SITE_DATA.name.first.split("").map((c, i) =>
+    i === 0 ? c : ""
+  ).join("");
+  $("navWordmark").innerHTML =
+    SITE_DATA.name.first[0] +
+    `<span>${SITE_DATA.name.first.slice(1)}</span>` +
+    SITE_DATA.name.last.split(" ").map((w, i) =>
+      i === 0 ? w[0] + `<span>${w.slice(1)}</span>` : ` ${w[0]}<span>${w.slice(1)}</span>`
+    ).join("") +
+    `<span style="color:var(--v)">_</span>`;
+
+  const ul = $("navLinks");
+  SITE_DATA.nav.forEach(item => {
+    const li = el("li", {}, `<a href="${item.href}">${item.label}</a>`);
+    ul.appendChild(li);
+  });
+}
+
+function renderHero() {
+  $("heroKicker").textContent = SITE_DATA.tagline;
+  $("heroName").innerHTML = `${SITE_DATA.name.first}<br/><em>${SITE_DATA.name.last}</em>`;
+  $("heroRole").textContent = SITE_DATA.role;
+  $("heroBio").textContent = SITE_DATA.bio;
+  $("heroFooterText").innerHTML = `${SITE_DATA.footerBlink}<span class="blink" style="color:var(--v)">_</span>`;
+
+  const actions = $("heroActions");
+  actions.appendChild(el("a", { href: "#projects", class: "pill pill-solid" }, "View work ↓"));
+  actions.appendChild(el("a", {
+    href: SITE_DATA.socials.github.url, target: "_blank", class: "pill pill-outline"
+  }, `${ICONS.github} GitHub`));
+  actions.appendChild(el("a", {
+    href: `mailto:${SITE_DATA.socials.email}`, class: "pill pill-outline"
+  }, `✉ Email me`));
+}
+
+function renderAbout() {
+  $("aboutNameEm").textContent = SITE_DATA.name.first;
+  $("aboutText").innerHTML = SITE_DATA.about.paragraphs.map(p => `<p>${p}</p>`).join("");
+  $("chipsCurrent").innerHTML = SITE_DATA.about.currentlyWorkingWith
+    .map(c => `<span class="chip">${c}</span>`).join("");
+  $("chipsCurious").innerHTML = SITE_DATA.about.curiousAbout
+    .map(c => `<span class="chip">${c}</span>`).join("");
+}
+
+function projectCard(p, contrib) {
+  const badges = p.badges.map(b => `<span class="badge ${b.cls}">${b.text}</span>`).join("");
+  return el("a", {
+    href: p.url, target: "_blank", class: `proj-card${contrib ? " contrib" : ""} reveal`
+  }, `
+    <div class="proj-top">
+      <span class="proj-emoji">${p.emoji}</span>
+      <span class="proj-arrow">↗</span>
+    </div>
+    <div class="proj-name">${p.name}</div>
+    <div class="proj-desc">${p.desc}</div>
+    <div class="proj-foot">
+      <span class="dot ${p.dot}"></span>
+      <span class="lang-name">${p.lang}</span>
+      ${badges}
+    </div>
+  `);
+}
+
+function renderProjects() {
+  const ownGrid = $("projGridOwn");
+  SITE_DATA.projects.own.forEach(p => ownGrid.appendChild(projectCard(p, false)));
+
+  const contribGrid = $("projGridContrib");
+  SITE_DATA.projects.contrib.forEach(p => contribGrid.appendChild(projectCard(p, true)));
+  const g = SITE_DATA.projects.ghost;
+  contribGrid.appendChild(el("div", { class: "proj-card proj-ghost" }, `
+    <div class="proj-top"><span class="proj-emoji">＋</span></div>
+    <div class="proj-name" style="color:var(--dim)">${g.label}</div>
+    <div class="proj-desc">${g.desc}</div>
+  `));
+}
+
+function renderSkills() {
+  const grid = $("skillsGrid");
+  SITE_DATA.skills.forEach(cell => {
+    const tags = cell.items.map(i => `<span class="skill-tag">${i}</span>`).join("");
+    grid.appendChild(el("div", { class: "skill-cell" }, `
+      <p class="skill-head">${cell.head}</p>
+      <div class="skill-items">${tags}</div>
+    `));
+  });
+}
+
+function renderAcademic() {
+  const row = $("academicRow");
+  SITE_DATA.academic.cards.forEach(c => {
+    row.appendChild(el("div", { class: "acad-card" }, `
+      <p class="acad-label">${c.label}</p>
+      <p class="acad-title">${c.title}</p>
+      <p class="acad-sub">${c.sub}</p>
+    `));
+  });
+
+  const cols = $("courseCols");
+  SITE_DATA.academic.courses.forEach(c => {
+    cols.appendChild(el("div", { class: `course-item${c.upcoming ? " upcoming" : ""}` }, c.name));
+  });
+}
+
+function renderNotes() {
+  const list = $("notesList");
+  if (!SITE_DATA.notes || !SITE_DATA.notes.length) {
+    list.parentElement.style.display = "none";
+    return;
+  }
+  SITE_DATA.notes.forEach(n => {
+    const tag = n.url ? "a" : "div";
+    const attrs = n.url ? { href: n.url, target: "_blank", class: "note-card reveal" } : { class: "note-card reveal" };
+    list.appendChild(el(tag, attrs, `
+      <div class="note-top">
+        <span class="note-title">${n.title}</span>
+        <span class="note-date">${n.date}</span>
+      </div>
+      <p class="note-summary">${n.summary}</p>
+    `));
+  });
+}
+
+function renderContact() {
+  $("contactBlurb").innerHTML = SITE_DATA.contact.blurb;
+  $("contactNote").innerHTML = SITE_DATA.contact.note;
+
+  const links = $("contactLinks");
+  const s = SITE_DATA.socials;
+  links.appendChild(el("a", { href: `mailto:${s.email}`, class: "clink" }, `
+    <span class="clink-icon">✉</span>
+    <span class="clink-label">Email</span>
+    <span class="clink-val">${s.email}</span>
+  `));
+  links.appendChild(el("a", { href: s.github.url, target: "_blank", class: "clink" }, `
+    <span class="clink-icon">${ICONS.github}</span>
+    <span class="clink-label">GitHub</span>
+    <span class="clink-val">@${s.github.user}</span>
+  `));
+  links.appendChild(el("a", { href: s.linkedin.url, target: "_blank", class: "clink" }, `
+    <span class="clink-icon">${ICONS.linkedin}</span>
+    <span class="clink-label">LinkedIn</span>
+    <span class="clink-val">${s.linkedin.handle}</span>
+  `));
+}
+
+function renderFooter() {
+  $("footerCopy").innerHTML =
+    `© ${SITE_DATA.footer.copyrightYear} ${SITE_DATA.name.first} ${SITE_DATA.name.last} &nbsp;·&nbsp; <em>${SITE_DATA.footer.builtWith}</em>`;
+  const links = $("footerLinks");
+  links.appendChild(el("a", { href: SITE_DATA.socials.github.url, target: "_blank" }, "GitHub"));
+  links.appendChild(el("a", { href: `mailto:${SITE_DATA.socials.email}` }, "Email"));
+  links.appendChild(el("a", { href: "#home" }, "↑ Top"));
+}
+
+function renderAll() {
+  renderNav();
+  renderHero();
+  renderAbout();
+  renderProjects();
+  renderSkills();
+  renderAcademic();
+  renderNotes();
+  renderContact();
+  renderFooter();
+}
+
+/* ─── BOOTSTRAP: render immediately, no fetch needed ─────────────── */
+function boot() {
+  renderAll();
+
+  /* ─── INTERACTIONS (run after render) ─────────────────── */
+  const hdr = document.getElementById('hdr');
+  const progressBar = document.getElementById('scrollProgress');
+  const navAnchors = document.querySelectorAll('nav a[href^="#"]');
+  const sections = Array.from(navAnchors)
+    .map(a => document.querySelector(a.getAttribute('href')))
+    .filter(Boolean);
+
+  window.addEventListener('scroll', () => {
+    hdr.classList.toggle('stuck', window.scrollY > 20);
+
+    // scroll progress
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = docHeight > 0 ? (window.scrollY / docHeight) * 100 : 0;
+    progressBar.style.width = pct + '%';
+
+    // active nav link
+    let current = sections[0];
+    for (const sec of sections) {
+      if (sec.getBoundingClientRect().top <= 120) current = sec;
+    }
+    navAnchors.forEach(a => {
+      a.classList.toggle('active', a.getAttribute('href') === '#' + current?.id);
+    });
+  });
+
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((e) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('in'), e.target.dataset.delay || 0);
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.08 });
+
+  document.querySelectorAll('.reveal').forEach((el, i) => {
+    el.dataset.delay = i * 40;
+    io.observe(el);
+  });
+
+  document.querySelectorAll('.proj-card.reveal').forEach((el, i) => {
+    el.style.transitionDelay = `${i * 60}ms`;
+  });
+}
+
+boot();
+</script>
+</body>
+</html>
